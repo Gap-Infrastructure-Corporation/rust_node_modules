@@ -1,0 +1,125 @@
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                              GOS MULTI-TENANT PLATFORM ARCHITECTURE                                 │
+│                    Secure Identity • Isolated Tenants • Full Visibility • Anywhere                  │
+└──────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+                                      GOS CENTRAL CONTROL PLANE
+                                         Platform Managed
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                                                                                      │
+│ ┌──────────────────┐ ┌────────────────┐ ┌────────────────┐ ┌────────────────┐ ┌───────────────────┐ │
+│ │     GIC IAM      │ │ TENANT         │ │ SUBSCRIPTION   │ │ ENTITLEMENT    │ │ MODULE & SERVICE  │ │
+│ │   Central IAM    │ │ REGISTRY       │ │ & TIER MANAGER │ │ ENGINE         │ │ CATALOGUE         │ │
+│ │                  │ │                │ │                │ │                │ │                   │ │
+│ │ • Authentication │ │ • Onboarding   │ │ • Standard     │ │ • Module access│ │ • FE modules      │ │
+│ │ • SSO            │ │ • Tenant data  │ │ • Professional │ │ • Service      │ │ • BE services     │ │
+│ │ • User identity  │ │ • Infra        │ │ • Enterprise   │ │   access       │ │ • Versions        │ │
+│ │ • Tenant context │ │   location     │ │ • Billing      │ │ • Usage limits │ │ • Dependencies    │ │
+│ │ • Token issuance │ │ • Health       │ │ • Usage        │ │ • Feature flags│ │                   │ │
+│ │ • Federation     │ │                │ │ • Plans        │ │ • Policies     │ │                   │ │
+│ │ • MFA / policies │ │                │ │                │ │                │ │                   │ │
+│ └────────┬─────────┘ └────────────────┘ └────────────────┘ └────────────────┘ └───────────────────┘ │
+│          │                                                                                           │
+│          │       ┌───────────────────────┐  ┌────────────────────────┐  ┌───────────────────────┐   │
+│          │       │ PROVISIONING &        │  │ CENTRAL OBSERVABILITY  │  │ GOVERNANCE & AUDIT    │   │
+│          │       │ CONFIGURATION         │  │                        │  │                       │   │
+│          │       │ • Deployment          │  │ • OTEL metrics         │  │ • Audit logs          │   │
+│          │       │ • Configuration       │  │ • OTEL traces          │  │ • Security events     │   │
+│          │       │ • Certs / secrets     │  │ • Logs                 │  │ • Compliance          │   │
+│          │       │ • Agent distribution  │  │ • Service usage        │  │ • Tenant activity     │   │
+│          │       └───────────────────────┘  │ • Tenant dashboards    │  │ • Data retention      │   │
+│          │                                  │ • Alerts / reporting   │  └───────────────────────┘   │
+│          │                                  └───────────▲────────────┘                              │
+└──────────┼──────────────────────────────────────────────┼─────────────────────────────────────────────┘
+           │                                              │
+           │ IDENTITY                                     │ TELEMETRY
+           │                                              │
+           ▼                                              │
+┌──────────────────────────────┐            ┌──────────────┴──────────────────────────────┐
+│ AUTHENTICATE VIA GIC IAM     │            │              GOS TELEMETRY HUB              │
+│                              │            │                                             │
+│ SSO / Identity               │            │ • Traces                                    │
+│ Tenant context               │            │ • Metrics                                   │
+│ Signed token                 │            │ • Logs                                      │
+└──────────────┬───────────────┘            │ • API transactions                          │
+               │                            │ • Service usage                              │
+               │                            │ • Business events                            │
+               │                            └──────────────▲──────────────────────────────┘
+               │                                           │
+               │                 ┌─────────────────────────┘
+               │                 │
+               │     ┌───────────┴─────────────────────────────────────────┐
+               │     │            SECURE CONTROL & DATA PLANE             │
+               │     │                                                    │
+               │     │  mTLS • Signed Entitlements • Config • Updates     │
+               │     └────────────────────────────────────────────────────┘
+               │
+               │
+        GIC IAM establishes identity
+        VMS performs tenant authorization
+               │
+       ┌───────┴────────────────────────────┬───────────────────────────────────┐
+       │                                    │                                   │
+       ▼                                    ▼                                   ▼
+
+
+┌────────────────────────────────┐ ┌────────────────────────────────┐ ┌────────────────────────────────┐
+│   TENANT A ISOLATION DOMAIN    │ │   TENANT B ISOLATION DOMAIN    │ │   TENANT C ISOLATION DOMAIN    │
+│                                │ │                                │ │                                │
+│ Customer Infrastructure       │ │ Public Cloud / Hybrid          │ │ Customer Data Centre           │
+│ GIC.co.za                     │ │ RoyalKhalahari.co.za           │ │ Blaauwklippen.co.za            │
+│                                │ │                                │ │                                │
+│ ┌────────────┐ ┌─────────────┐ │ │ ┌────────────┐ ┌─────────────┐ │ │ ┌────────────┐ ┌─────────────┐ │
+│ │TENANT AGENT│ │ GOS         │ │ │ │TENANT AGENT│ │ GOS         │ │ │ │TENANT AGENT│ │ GOS         │ │
+│ │            │ │ TELEMETRY   │ │ │ │            │ │ TELEMETRY   │ │ │ │            │ │ TELEMETRY   │ │
+│ │Entitlement │ │ GATEWAY     │ │ │ │Entitlement │ │ GATEWAY     │ │ │ │Entitlement │ │ GATEWAY     │ │
+│ │Config      │ │             │ │ │ │Config      │ │             │ │ │ │Config      │ │             │ │
+│ │Updates     │ │ API tracking│ │ │ │Updates     │ │ API tracking│ │ │ │Updates     │ │ API tracking│ │
+│ │Health      │ │ OTEL        │ │ │ │Health      │ │ OTEL        │ │ │ │Health      │ │ OTEL        │ │
+│ │Status      │ │ Usage       │ │ │ │Status      │ │ Usage       │ │ │ │Status      │ │ Usage       │ │
+│ └──────┬─────┘ └──────▲──────┘ │ │ └──────┬─────┘ └──────▲──────┘ │ │ └──────┬─────┘ └──────▲──────┘ │
+│        │              │         │ │        │              │         │ │        │              │         │
+│        └──────┬───────┘         │ │        └──────┬───────┘         │ │        └──────┬───────┘         │
+│               ▼                 │ │               ▼                 │ │               ▼                 │
+│ ┌──────────────────────────────┐│ │ ┌──────────────────────────────┐│ │ ┌──────────────────────────────┐│
+│ │ VENDOR MANAGEMENT SYSTEM    ││ │ │ VENDOR MANAGEMENT SYSTEM    ││ │ │ VENDOR MANAGEMENT SYSTEM    ││
+│ │            (VMS)            ││ │ │            (VMS)            ││ │ │            (VMS)            ││
+│ │                              ││ │ │                              ││ │ │                              ││
+│ │ • Tenant administrators      ││ │ │ • Tenant administrators      ││ │ │ • Tenant administrators      ││
+│ │ • Users                      ││ │ │ • Users                      ││ │ │ • Users                      ││
+│ │ • Vendors                    ││ │ │ • Vendors                    ││ │ │ • Vendors                    ││
+│ │ • Groups                     ││ │ │ • Groups                     ││ │ │ • Groups                     ││
+│ │ • Roles                      ││ │ │ • Roles                      ││ │ │ • Roles                      ││
+│ │ • Permissions                ││ │ │ • Permissions                ││ │ │ • Permissions                ││
+│ │ • Policies / workflows       ││ │ │ • Policies / workflows       ││ │ │ • Policies / workflows       ││
+│ │                              ││ │ │                              ││ │ │                              ││
+│ │ Uses identity from GIC IAM   ││ │ │ Uses identity from GIC IAM   ││ │ │ Uses identity from GIC IAM   ││
+│ │ Authorizes inside tenant     ││ │ │ Authorizes inside tenant     ││ │ │ Authorizes inside tenant     ││
+│ └──────────────┬───────────────┘│ │ └──────────────┬───────────────┘│ │ └──────────────┬───────────────┘│
+│                │                │ │                │                │ │                │                │
+│      ┌─────────┼─────────┐      │ │      ┌─────────┼─────────┐      │ │      ┌─────────┼─────────┐      │
+│      ▼         ▼         ▼      │ │      ▼         ▼         ▼      │ │      ▼         ▼         ▼      │
+│ ┌─────────┐ ┌─────────┐ ┌─────┐│ │ ┌─────────┐ ┌─────────┐ ┌─────┐│ │ ┌─────────┐ ┌─────────┐ ┌─────┐│
+│ │FRONTEND │ │ BACKEND │ │ DB  ││ │ │FRONTEND │ │ BACKEND │ │ DB  ││ │ │FRONTEND │ │ BACKEND │ │ DB  ││
+│ │ MODULES │ │SERVICES │ │     ││ │ │ MODULES │ │SERVICES │ │     ││ │ │ MODULES │ │SERVICES │ │     ││
+│ │         │ │         │ │     ││ │ │         │ │         │ │     ││ │ │         │ │         │ │     ││
+│ │1.Project│ │1.sio-   │ │Tenant│ │ │1.Project│ │1.sio-   │ │Tenant│ │ │1.Project│ │1.sio-   │ │Tenant│
+│ │  Admin  │ │document-│ │data ││ │ │  Admin  │ │document-│ │data ││ │ │  Admin  │ │document-│ │data ││
+│ │2.Signflow││service  │ │     ││ │ │2.Signflow││service  │ │     ││ │ │2.Signflow││service  │ │     ││
+│ │3.Docuweave│2.echo-api│ │Schema││ │ │3.Docuweave│2.echo-api│ │Schema││ │ │3.Docuweave│2.echo-api│ │Schema││
+│ │4.Echo   │ │3.integration-│/DB││ │ │4.Echo   │ │3.integration-│/DB││ │ │4.Echo   │ │3.integration-│/DB││
+│ │         │ │  service│ │     ││ │ │         │ │  service│ │     ││ │ │         │ │  service│ │     ││
+│ │         │ │4.nexus-api│Encrypted│ │         │ │4.nexus-api│Encrypted│ │         │ │4.nexus-api│Encrypted│
+│ └─────────┘ └─────────┘ └─────┘│ │ └─────────┘ └─────────┘ └─────┘│ │ └─────────┘ └─────────┘ └─────┘│
+│                                │ │                                │ │                                │
+└────────────────────────────────┘ └────────────────────────────────┘ └────────────────────────────────┘
+          │                                    │                                  │
+          │                                    │                                  │
+          └─────────────── TELEMETRY ──────────┴──────────────────────────────────┘
+                                               │
+                                               ▼
+                                    GOS TELEMETRY HUB
+                                               │
+                                               ▼
+                                   CENTRAL OBSERVABILITY

@@ -1,0 +1,61 @@
+Responsibility split
+
+GIC IAM
+   │
+   └── WHO are you?
+       Which tenant are you associated with?
+       Establish authentication / identity / tenant context.
+
+GOS CONTROL PLANE
+   │
+   └── WHAT has this tenant purchased?
+       Which modules, services, features and limits are enabled?
+
+TENANT VMS
+   │
+   └── WHAT can this person/vendor do inside this tenant?
+       Users, vendors, roles, permissions, policies and workflows.
+
+GOS TELEMETRY
+   │
+   └── WHAT is actually happening?
+       API calls, service usage, traces, logs, metrics, errors,
+       performance and business usage.
+
+
+Access rule:
+
+          GOS ENTITLEMENT
+                 ∩
+          GIC IAM IDENTITY
+                 ∩
+          VMS PERMISSION
+                 ∩
+          RESOURCE POLICY
+                 │
+                 ▼
+          EFFECTIVE ACCESS
+
+
+Operational View: 
+
+Tenant
+  └── Application
+       └── Backend Service
+            └── API Endpoint
+                 ├── Request count
+                 ├── Success / failure
+                 ├── Latency
+                 ├── CPU / memory impact
+                 ├── Trace
+                 ├── Logs
+                 └── Usage / business event
+                          │
+                          ▼
+                 GOS Telemetry Gateway
+                          │
+                          ▼
+                   GOS Telemetry Hub
+                          │
+                          ▼
+                 Central Observability
